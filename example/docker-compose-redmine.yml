@@ -1,0 +1,44 @@
+version: '2'
+
+services:
+
+  nginx:
+    image: t0be/nginx-le
+    container_name: nginx
+    restart: unless-stopped
+    depends_on:
+      - redmine
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+      - ./docker/nginx/log:/var/log/nginx
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - TZ=GMT
+      - LE_FQDN=www.example.com
+
+  redmine:
+    image: redmine
+    container_name: redmine
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - 3000
+    environment:
+      REDMINE_DB_MYSQL: db
+      REDMINE_DB_PASSWORD: CHANGE_THIS_PASS!
+    volumes:
+      - ./docker/redmine/files:/usr/src/redmine/files
+
+  db:
+    image: mysql:5.7
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: CHANGE_THIS_PASS!
+      MYSQL_DATABASE: redmine
+    volumes:
+      - ./docker/mysql:/var/lib/mysql

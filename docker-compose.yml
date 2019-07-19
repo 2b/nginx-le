@@ -1,0 +1,20 @@
+version: '2'
+
+services:
+
+  nginx:
+    build: .
+    image: t0be/nginx-le:latest
+    hostname: nginx
+    restart: unless-stopped
+    container_name: nginx
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+      - ./docker/nginx/log:/var/log/nginx
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - TZ=GMT
+      - LE_FQDN=www.example.com
